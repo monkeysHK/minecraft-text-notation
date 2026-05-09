@@ -44,7 +44,7 @@ A tag consists of a tag name followed by zero or more tag arguments. The tag nam
 
 > **Example**
 > 
-> The following tags are equivallent:
+> The following tags are equivalent:
 > ```
 > <hover:show_text:"Hello">
 > <hover:"show_text":'Hello'>
@@ -73,7 +73,7 @@ Tag names and unquoted strings should contain only alphanumerical characters and
 All Unicode characters may be placed within plain texts, double-quoted strings, and single-quoted strings.
 
 ```
-<plain-text> ::= (any Unicode character except the unescaped "<")
+<plain-text> ::= (sequence of Unicode character except the unescaped "<")
 
 <quoted-or-unquoted-string> ::= '"' <double-quoted-string-content> '"'
                               | "'" <single-quoted-string-content> "'"
@@ -86,13 +86,13 @@ All Unicode characters may be placed within plain texts, double-quoted strings, 
 <double-quoted-string-content> ::= (sequence of Unicode character except the unescaped '"')
 ```
 
-#### White Spaces
+#### White Spaces and Line Breaks
 
 White spaces should not be stripped from tag names, plain texts, double-quoted strings, or single-quoted strings.
 
 The newline character may be used within plain texts, double-quoted strings, and single-quoted strings.
 
-The newline character and the `<br>` tag should cause a line break in plain texts.
+The newline character and the `<br>` tag should cause a line break in plain texts. This is except when the newline is escaped, causing the line break to be canceled.
 
 > **Example**
 > 
@@ -105,7 +105,7 @@ The newline character and the `<br>` tag should cause a line break in plain text
 
 #### Escapes
 
-In plain text, double-quoted strings, and single-quoted strings, `\\` should be a valid escape for the literal `\`.
+In plain text, double-quoted strings, and single-quoted strings, `\\` should be a valid escape for the literal `\`. `\` followed by a newline should be a valid escape to cancel the line break.
 
 In plain text, `\<` should be a valid escape for the literal `<`.
 
@@ -122,6 +122,8 @@ All uses of the backslash unspecified in this section should create invalid esca
 > <hover:show_text:'Escaping the single quote: \''></hover>
 > Escaping the left angle bracket in plain text: \<
 > Escaping the backslash: \\
+> The line break here \
+> is canceled.
 > ```
 
 ### Strict Mode
@@ -140,27 +142,28 @@ In non-strict mode, the rule-violating sections should be coerced into plain tex
 
 - An invalid tag should be rendered as text literals.
 - An invalid escape should be rendered as text literals.
-- An end tag should close the closest previous matching unclosed start tag and all unclosed start tags between itself and the found tag, if it can find one.
+- An end tag should close the closest previous matching unclosed start tag (the "found tag") and all unclosed start tags between itself and the found tag, if it can find one.
 - A reset tag should close all unclosed start tags between itself and the beginning of the sequence.
+- The end of file should close all unclosed start tags.
 
 > **Example**
 > 
-> The following notations are equivallent in non-strict mode.
+> The following notations are equivalent in non-strict mode.
 > ```
 > <bold><italic><underlined>Hello,</italic> world!
 > ```
-> is equivallent to
+> is equivalent to
 > ```
 > <bold><italic><underlined>Hello,</underlined></italic> world!</bold>
 > ```
 
 > **Example**
 > 
-> The following notations are equivallent in non-strict mode.
+> The following notations are equivalent in non-strict mode.
 > ```
 > <yellow>Hello, <bold>world<reset><italic>!
 > ```
-> is equivallent to
+> is equivalent to
 > ```
 > <yellow>Hello, <bold>world</bold></yellow><italic>!</italic>
 > ```
@@ -231,7 +234,7 @@ A color tag must have the one tag argument that is one of the following:
 > **Example**
 > 
 > ```
-> Player: <color:yellow>How is it going, <color:#abcdef>World?
+> Player: <color:yellow>How is it going, <color:"#abcdef">World?
 > ```
 
 ### Decoration Tags
@@ -298,7 +301,7 @@ A show text tag is a hover tag with the `show_text` action. The tag must have a 
         | "<" <normal-tag-content> ">"
         | "</" <normal-tag-content> ">"
 
-<plain-text> ::= (any Unicode character except the unescaped "<")
+<plain-text> ::= (sequence of Unicode character except the unescaped "<")
 
 <quoted-or-unquoted-string> ::= '"' <double-quoted-string-content> '"'
                               | "'" <single-quoted-string-content> "'"
